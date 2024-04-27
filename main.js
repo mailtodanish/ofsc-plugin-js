@@ -22,6 +22,28 @@
       }
       return "";
     };
+    this.open = function (data) {
+      console.error("Activity Data", data.activity.aid);
+      const aid = document.getElementById("aid");
+      aid.innerHTML = "Activity ID: " + data.activity.aid;
+
+      const status = document.getElementById("status");
+      status.innerHTML = "Status: " + data.activity.astatus;
+
+      const travel = document.getElementById("travel");
+      travel.innerHTML = "  Travel: " + data.activity.travel;
+
+      const position_in_route = document.getElementById("position_in_route");
+      position_in_route.innerHTML = "  Position in route: " + data.activity.position_in_route;
+
+      const closeButton = document.getElementById("close");
+      closeButton.onclick = () => {
+        this.sendPostMessageData({
+          apiVersion: 1,
+          method: "close",
+        });
+      };
+    };
 
     this.sendPostMessageData = function (data) {
       console.error("Sent>>", data);
@@ -40,6 +62,7 @@
           break;
         case "open":
           console.error("Open method called");
+          this.open(data);
           break;
         case "error":
           console.error("Open method called");

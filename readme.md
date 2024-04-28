@@ -1,4 +1,4 @@
-## OFSC Plugin
+## OFSC Plugin in core JavaScript
 
 JS ofsc plugin boilerplate
 

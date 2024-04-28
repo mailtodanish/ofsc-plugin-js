@@ -23,26 +23,45 @@
       return "";
     };
     this.open = function (data) {
-      console.error("Activity Data", data.activity.aid);
+      // Implement PluginUI
       const aid = document.getElementById("aid");
-      aid.innerHTML = "Activity ID: " + data.activity.aid;
+      aid.innerHTML = "Activity Id: " + data.activity.aid;
 
-      const status = document.getElementById("status");
-      status.innerHTML = "Status: " + data.activity.astatus;
+      const astatus = document.getElementById("astatus");
+      astatus.innerHTML = "Activity Status: " + data.activity.astatus;
 
-      const travel = document.getElementById("travel");
-      travel.innerHTML = "  Travel: " + data.activity.travel;
+      const travel_time = document.getElementById("travel_time");
+      if (travel_time !== null) {
+        travel_time.value = data.activity?.travel.toString() || "";
+      }
 
       const position_in_route = document.getElementById("position_in_route");
-      position_in_route.innerHTML = "  Position in route: " + data.activity.position_in_route;
+      position_in_route.innerHTML = "Activity travel: " + data.activity.position_in_route;
 
-      const closeButton = document.getElementById("close");
-      closeButton.onclick = () => {
-        this.sendPostMessageData({
-          apiVersion: 1,
-          method: "close",
-        });
-      };
+      const closeButton = document.getElementById("dismiss_button");
+      closeButton.addEventListener(
+        "click",
+        function () {
+          this.sendPostMessageData({
+            apiVersion: 1,
+            method: "close",
+          });
+        }.bind(this)
+      );
+
+      const updateButton = document.getElementById("submit_button");
+      updateButton.addEventListener(
+        "click",
+        function () {
+          this.sendPostMessageData({
+            apiVersion: 1,
+            method: "update",
+            activity: {
+              travel: travel_time.value,
+            },
+          });
+        }.bind(this)
+      );
     };
 
     this.sendPostMessageData = function (data) {
@@ -64,8 +83,13 @@
           console.error("Open method called");
           this.open(data);
           break;
+        case "updateResult":
+          console.error("UpdateResult method called");
+          break;
         case "error":
-          console.error("Open method called");
+          console.error("Error method called");
+          console.error(data.errors);
+          confirm(JSON.stringify(data.errors));
           break;
         case "close":
           this.sendPostMessageData({

@@ -2,6 +2,9 @@
 
 JS ofsc plugin boilerplate
 
+
+## Methods
+
 ### Init 
 
 

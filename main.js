@@ -57,6 +57,7 @@
             apiVersion: 1,
             method: "update",
             activity: {
+              aid: data.activity.aid,
               travel: travel_time.value,
             },
           });

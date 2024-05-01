@@ -52,18 +52,33 @@
                 <option value="480">8 Hours</option>
             </select>
         </div>
+
+        <div class="d-flex p-2 flex-column">
+            <span class="fw-bold">Reason</span>
+            <select id="reason_code" style="width: 50%;"
+                aria-label="Reason">
+               
+            </select>
+        </div>
+
+        <div class="d-flex p-2 flex-column">        
+            <button type="button" id="dismiss_button"
+                class="btn btn-outline-secondary ">Dismiss</button>
+                <button type="button" id="update_activity"
+                class="btn btn-outline-secondary ">Update</button>
+                <button type="button" id="close_update"
+                class="btn btn-outline-secondary ">CloseUpdate</button>
+                <!-- 
+                <button type="button" id="close_activity"
+                class="btn btn-outline-secondary ">Close</button> -->
+        </div>
+
+        
     </div>
 
 
 
-    <div class="col col-sm-12 col-md-12 d-flex flex-row-reverse gap-1">
-        <button type="button" id="submit_button"
-            class="btn btn-secondary ">Update</button>
-        <button type="button" id="dismiss_button"
-            class="btn btn-outline-secondary ">Dismiss</button>
-
-
-    </div>
+   
     <script src="./main.js"></script>
 
 </body>

@@ -22,13 +22,31 @@
       }
       return "";
     };
+    this.getMetaAttributes = function (data) {
+      if (data) {
+        const json = JSON.parse(data);
+        this.XA_DISCREPANCY_REASON_ATTRIBUTES = json.XA_DISCREPANCY_REASON.enum;
+        console.error("XA_DISCREPANCY_REASON_ATTRIBUTES", this.XA_DISCREPANCY_REASON_ATTRIBUTES);
+        const reason_code = document.getElementById("reason_code");
+        for (const [key, value] of Object.entries(this.XA_DISCREPANCY_REASON_ATTRIBUTES)) {
+          const option = document.createElement("option");
+          option.value = key;
+          option.text = value.text;
+          reason_code.appendChild(option);
+        }
+      }
+    };
     this.open = function (data) {
+      // getMetadata of properties
+      this.getMetaAttributes(localStorage.getItem("simplePlugin"));
       // Implement PluginUI
       const aid = document.getElementById("aid");
       aid.innerHTML = "Activity Id: " + data.activity.aid;
 
       const astatus = document.getElementById("astatus");
       astatus.innerHTML = "Activity Status: " + data.activity.astatus;
+
+      const reason_code = document.getElementById("reason_code");
 
       const travel_time = document.getElementById("travel_time");
       if (travel_time !== null) {
@@ -49,7 +67,7 @@
         }.bind(this)
       );
 
-      const updateButton = document.getElementById("submit_button");
+      const updateButton = document.getElementById("update_activity");
       updateButton.addEventListener(
         "click",
         function () {
@@ -57,8 +75,25 @@
             apiVersion: 1,
             method: "update",
             activity: {
-              aid: data.activity.aid,
               travel: travel_time.value,
+              aid: data.activity.aid,
+              XA_DISCREPANCY_REASON: reason_code.value,
+            },
+          });
+        }.bind(this)
+      );
+
+      const closeUpdate = document.getElementById("close_update");
+      closeUpdate.addEventListener(
+        "click",
+        function () {
+          this.sendPostMessageData({
+            apiVersion: 1,
+            method: "close",
+            activity: {
+              travel: travel_time.value,
+              aid: data.activity.aid,
+              XA_DISCREPANCY_REASON: reason_code.value,
             },
           });
         }.bind(this)
@@ -66,15 +101,16 @@
     };
 
     this.sendPostMessageData = function (data) {
-      console.error("Sent>>", data);
+      console.error("Sent>>", JSON.stringify(data, undefined, "\t"));
       parent.postMessage(JSON.stringify(data), this.getOrigin(document.referrer));
     };
     this._messageListener = function (event) {
       const data = JSON.parse(event.data);
-      console.error("Received>>", data);
+      console.error("Received>>", JSON.stringify(data, undefined, "\t"));
       switch (data.method) {
         case "init":
           console.error("Init method called");
+          localStorage.setItem("simplePlugin", JSON.stringify(data.attributeDescription));
           this.sendPostMessageData({
             apiVersion: 1,
             method: "initEnd",
@@ -89,8 +125,7 @@
           break;
         case "error":
           console.error("Error method called");
-          console.error(data.errors);
-          confirm(JSON.stringify(data.errors));
+          confirm(JSON.stringify(data.error));
           break;
         case "close":
           this.sendPostMessageData({

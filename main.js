@@ -25,8 +25,8 @@
     this.getMetaAttributes = function (data) {
       if (data) {
         const json = JSON.parse(data);
-        this.XA_DISCREPANCY_REASON_ATTRIBUTES = json.XA_DISCREPANCY_REASON.enum;
-        console.error("XA_DISCREPANCY_REASON_ATTRIBUTES", this.XA_DISCREPANCY_REASON_ATTRIBUTES);
+        this.XA_DISCREPANCY_REASON_ATTRIBUTES = json["XA_DISCREPANCY_REASON_ATTRIBUTES"]["enum"];
+        
         const reason_code = document.getElementById("reason_code");
         for (const [key, value] of Object.entries(this.XA_DISCREPANCY_REASON_ATTRIBUTES)) {
           const option = document.createElement("option");

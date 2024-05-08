@@ -26,7 +26,7 @@
       if (data) {
         const json = JSON.parse(data);
         this.XA_DISCREPANCY_REASON_ATTRIBUTES = json["XA_DISCREPANCY_REASON_ATTRIBUTES"]["enum"];
-        
+
         const reason_code = document.getElementById("reason_code");
         for (const [key, value] of Object.entries(this.XA_DISCREPANCY_REASON_ATTRIBUTES)) {
           const option = document.createElement("option");
@@ -36,9 +36,35 @@
         }
       }
     };
+
+    // External API in plugin
+    this.countrylist = function (url, userId, passworf) {
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const country = document.getElementById("country");
+          for (const [key, value] of Object.entries(data)) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.text = value.name.official;
+            country.appendChild(option);
+          }
+        });
+    };
+
     this.open = function (data) {
       // getMetadata of properties
       this.getMetaAttributes(localStorage.getItem("simplePlugin"));
+
+      this.secureData = data.securedData;
+
+      this.countrylist(this.secureData.countryListAPI, this.secureData.userId, this.secureData.password);
+
       // Implement PluginUI
       const aid = document.getElementById("aid");
       aid.innerHTML = "Activity Id: " + data.activity.aid;
@@ -75,7 +101,6 @@
             apiVersion: 1,
             method: "update",
             activity: {
-              travel: travel_time.value,
               aid: data.activity.aid,
               XA_DISCREPANCY_REASON: reason_code.value,
             },
@@ -91,7 +116,6 @@
             apiVersion: 1,
             method: "close",
             activity: {
-              travel: travel_time.value,
               aid: data.activity.aid,
               XA_DISCREPANCY_REASON: reason_code.value,
             },
@@ -118,6 +142,7 @@
           break;
         case "open":
           console.error("Open method called");
+
           this.open(data);
           break;
         case "updateResult":

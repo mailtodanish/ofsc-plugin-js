@@ -22,6 +22,7 @@
       }
       return "";
     };
+
     this.getMetaAttributes = function (data) {
       if (data) {
         const json = JSON.parse(data);
@@ -35,6 +36,19 @@
           reason_code.appendChild(option);
         }
       }
+    };
+
+    this.generateCallId = function () {
+      return btoa(String.fromCharCode.apply(null, window.crypto.getRandomValues(new Uint8Array(16))));
+    };
+
+    this.searchPart = function () {
+      this.sendPostMessageData({
+        apiVersion: 1,
+        callId: this.generateCallId(),
+        method: "callProcedure",
+        procedure: "getPartsCatalogsStructure",
+      });
     };
 
     // External API in plugin
@@ -63,7 +77,7 @@
 
       this.secureData = data.securedData;
 
-      this.countrylist(this.secureData.countryListAPI, this.secureData.userId, this.secureData.password);
+      // this.countrylist(this.secureData.countryListAPI, this.secureData.userId, this.secureData.password);
 
       // Implement PluginUI
       const aid = document.getElementById("aid");
@@ -90,6 +104,14 @@
             apiVersion: 1,
             method: "close",
           });
+        }.bind(this)
+      );
+
+      const search_parts = document.getElementById("search_parts");
+      search_parts.addEventListener(
+        "click",
+        function () {
+          this.searchPart();
         }.bind(this)
       );
 
@@ -142,8 +164,10 @@
           break;
         case "open":
           console.error("Open method called");
-
           this.open(data);
+          break;
+        case "callProcedureResult":
+          console.error("callProcedureResult received");
           break;
         case "updateResult":
           console.error("UpdateResult method called");

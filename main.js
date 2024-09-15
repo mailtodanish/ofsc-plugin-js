@@ -1,5 +1,4 @@
 // Ready ->init ->initEnd->remove
-// TODO : Create a custome field : XA_DISCREPANCY_REASON as ENU in OFSC
 
 "use strict";
 (function () {
@@ -75,7 +74,7 @@
 
     this.open = function (data) {
       // getMetadata of properties
-      this.getMetaAttributes(localStorage.getItem("simplePlugin"));
+      // this.getMetaAttributes(localStorage.getItem("simplePlugin"));
 
       this.secureData = data.securedData;
 
@@ -126,7 +125,7 @@
             method: "update",
             activity: {
               aid: data.activity.aid,
-              XA_DISCREPANCY_REASON: reason_code.value,
+              // XA_DISCREPANCY_REASON: reason_code.value,
             },
           });
         }.bind(this)
@@ -141,7 +140,7 @@
             method: "close",
             activity: {
               aid: data.activity.aid,
-              XA_DISCREPANCY_REASON: reason_code.value,
+              // XA_DISCREPANCY_REASON: reason_code.value,
             },
           });
         }.bind(this)

@@ -1,4 +1,27 @@
-// Ready ->init ->initEnd->remove
+/**
+ * [MOHD AHSHAN DANISH][23 December 2024]
+ * OFSC Plugin JavaScript
+ *
+ * This script defines a plugin for the Oracle Field Service Cloud (OFSC) application.
+ * It initializes the plugin, handles messages, and populates discrepancy reason attributes.
+ *
+ * Functions:
+ * - init: Initializes the plugin and sets up the message listener.
+ * - getOrigin: Extracts the origin from a given URL.
+ * - getMetaAttributes: Parses and populates discrepancy reason attributes from provided data.
+ * - generateCallId: Generates a unique call ID.
+ * - searchPart: Searches for parts catalog structures.
+ * - countrylist: Fetches and populates the country list.
+ * - open: Initializes the plugin UI.
+ * - sendPostMessageData: Sends data to the parent window.
+ * - _messageListener: Handles messages from the parent window.
+ * @version 0.1.0
+ * @since 0.1.0
+ * @param {void}
+ * @returns {void}
+ * @throws {Error} - If there is an error
+ *
+ */
 
 "use strict";
 (function () {
@@ -24,6 +47,7 @@
       return "";
     };
 
+    // Sample code for populating dropdwon using Metadata
     this.getMetaAttributes = function (data) {
       if (data) {
         const json = JSON.parse(data);
@@ -151,12 +175,12 @@
       console.error("Sent>>", JSON.stringify(data, undefined, "\t"));
       parent.postMessage(JSON.stringify(data), this.getOrigin(document.referrer));
     };
+
     this._messageListener = function (event) {
       const data = JSON.parse(event.data);
       console.error("Received>>", JSON.stringify(data, undefined, "\t"));
       switch (data.method) {
         case "init":
-          console.error("Init method called");
           localStorage.setItem("simplePlugin", JSON.stringify(data.attributeDescription));
           this.sendPostMessageData({
             apiVersion: 1,
@@ -164,17 +188,13 @@
           });
           break;
         case "open":
-          console.error("Open method called");
           this.open(data);
           break;
         case "callProcedureResult":
-          console.error("callProcedureResult received");
           break;
         case "updateResult":
-          console.error("UpdateResult method called");
           break;
         case "error":
-          console.error("Error method called");
           confirm(JSON.stringify(data.error));
           break;
         case "close":

@@ -1,7 +1,7 @@
 /**
  * [MOHD AHSHAN DANISH][23 December 2024]
  * Service Worker for Sample Plugin
- * This service worker caches the index.html and excessReturnMain.js files.
+ * This service worker caches the index.html and plugin.js files.
  * It also caches the fetch requests and responses.
  * It also deletes the old caches on activation.
  * It does not cache the POST requests.

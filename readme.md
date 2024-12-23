@@ -1,9 +1,6 @@
 ## A JavaScript Sample Plugin for Oracle Field Service (OFSC)
 
-### Service Worker is already Implemented to improve *Browser cahce*
-
-This is sample plugin in JAVA Script for Oracle field service
-
+### Service Workers are implemented to improve offline capabilities, enhance performance, and ensure an overall improved user experience.It also reduces server call by utilizing local caching.
 
 ## Zip only below files and upload to OFSC
 

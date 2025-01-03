@@ -12,78 +12,26 @@
 
 <body>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker
-                .register('sample-plugin-sw.js', {
-                    updateViaCache: 'none',
-                }).then(function () { console.log("Service Worker is registered" + navigator.serviceWorker.controller); }).catch((error) => {
-                    console.log('Service Worker Registration failed with ' + error);
-                });
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.register('./serviceWorker.js',{
+                updateViaCache: 'none'
+            })
+            .then((reg) => console.log('service worker registered', reg))
+            .catch((err) => console.log('service worker not registered', err));
         }
     </script>
+   
     <div class="container mt-5 card p-10">
-
-
-        <div class="row">
-            <div class="col">
-                <div id="aid"></div>
-            </div>
-            <div class="col">
-                <div id="astatus"></div>
-            </div>
+        <h5>DEMO PLUGIN</h5>
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="nameId" placeholder="Enter Name">
         </div>
-        <div class="row">
-            <div class="col">
-                <div id="travel"></div>
-            </div>
-            <div class="col">
-                <div id="position_in_route"></div>
-            </div>
+        <div id="divId" class="mt-5  d-flex justify-content-center">
+            <button class="btn btn-primary " id="SubmitBtnId">Submit/Close</button>
+            <button class="btn btn-primary " id="SaveBtnId">Save</button>
+            <button class="btn btn-primary " id="CancelBtnId">Cancel</button>
         </div>
-
-        <div class="d-flex p-2 flex-column">
-            <span class="fw-bold">Travel Time</span>
-            <select id="travel_time" style="width: 50%;" aria-label="Travel Time">
-                <option value="0"></option>
-                <option value="5">5 Minutes</option>
-                <option value="10">10 Minutes</option>
-                <option value="15">15 Minutes</option>
-                <option selected value="30">30 Minutes</option>
-                <option value="45">45 Minutes</option>
-                <option value="60">1 Hour</option>
-                <option value="90">1 Hour 30 Minutes</option>
-                <option value="120">2 Hours</option>
-                <option value="180">3 Hours</option>
-                <option value="240">4 Hours</option>
-                <option value="480">8 Hours</option>
-            </select>
-        </div>
-
-        <div class="d-flex p-2 flex-column">
-            <span class="fw-bold">Reason</span>
-            <select id="reason_code" style="width: 50%;" aria-label="Reason">
-
-            </select>
-        </div>
-
-        <div class="d-flex p-2 flex-column">
-            <span class="fw-bold">Country</span>
-            <select id="country" style="width: 50%;" aria-label="country">
-
-            </select>
-        </div>
-
-        <div class="d-flex p-2 flex-column">
-            <button type="button" id="search_parts" class="btn btn-outline-secondary ">Search Parts</button>
-            <button type="button" id="dismiss_button" class="btn btn-outline-secondary ">Dismiss</button>
-            <button type="button" id="update_activity" class="btn btn-outline-secondary ">Update</button>
-            <button type="button" id="close_update" class="btn btn-outline-secondary ">CloseUpdate</button>
-            <!-- 
-                <button type="button" id="close_activity"
-                class="btn btn-outline-secondary ">Close</button> -->
-        </div>
-
-
     </div>
 
 

@@ -26,7 +26,8 @@
 "use strict";
 (function () {
   window.OfscPlugin = function () {
-    this.init = function (messageListener) {
+    this.init = function (pluginName) {
+      this.tag = pluginName;
       window.addEventListener("message", this._messageListener.bind(this), false);
       this.sendPostMessageData({
         apiVersion: 1,
@@ -97,97 +98,94 @@
     };
 
     this.open = function (data) {
-      // getMetadata of properties
-      // this.getMetaAttributes(localStorage.getItem("simplePlugin"));
+      let activity = data.activity;
+      let securedData = data.securedData;
+      console.error("Open>>", activity);
 
-      this.secureData = data.securedData;
+      const nameId = document.getElementById("nameId");
 
-      // this.countrylist(this.secureData.countryListAPI, this.secureData.userId, this.secureData.password);
-
-      // Implement PluginUI
-      const aid = document.getElementById("aid");
-      aid.innerHTML = "Activity Id: " + data.activity.aid;
-
-      const astatus = document.getElementById("astatus");
-      astatus.innerHTML = "Activity Status: " + data.activity.astatus;
-
-      const reason_code = document.getElementById("reason_code");
-
-      const travel_time = document.getElementById("travel_time");
-      if (travel_time !== null) {
-        travel_time.value = data.activity?.travel.toString() || "";
-      }
-
-      const position_in_route = document.getElementById("position_in_route");
-      position_in_route.innerHTML = "Activity travel: " + data.activity.position_in_route;
-
-      const closeButton = document.getElementById("dismiss_button");
-      closeButton.addEventListener(
-        "click",
-        function () {
+      const submit = document.getElementById("SubmitBtnId");
+      if (!!submit) {
+        submit.addEventListener("click", () => {
+          let value = nameId.value; // User Input
           this.sendPostMessageData({
             apiVersion: 1,
             method: "close",
+            activity: {
+              aid: activity.aid,
+              XA_RESOLUTION_CODE: value,
+            },
           });
-        }.bind(this)
-      );
+        });
+      }
 
-      const search_parts = document.getElementById("search_parts");
-      search_parts.addEventListener(
-        "click",
-        function () {
-          this.searchPart();
-        }.bind(this)
-      );
-
-      const updateButton = document.getElementById("update_activity");
-      updateButton.addEventListener(
-        "click",
-        function () {
+      const SaveBtnId = document.getElementById("SaveBtnId");
+      if (!!SaveBtnId) {
+        SaveBtnId.addEventListener("click", () => {
+          let value = nameId.value; // User Input
           this.sendPostMessageData({
             apiVersion: 1,
             method: "update",
             activity: {
-              aid: data.activity.aid,
-              // XA_DISCREPANCY_REASON: reason_code.value,
+              aid: activity.aid,
+              XA_RESOLUTION_CODE: value,
             },
           });
-        }.bind(this)
-      );
+        });
+      }
 
-      const closeUpdate = document.getElementById("close_update");
-      closeUpdate.addEventListener(
-        "click",
-        function () {
+      // cancel Button
+      const CancelBtnId = document.getElementById("CancelBtnId");
+      if (!!CancelBtnId) {
+        CancelBtnId.addEventListener("click", () => {
           this.sendPostMessageData({
             apiVersion: 1,
             method: "close",
-            activity: {
-              aid: data.activity.aid,
-              // XA_DISCREPANCY_REASON: reason_code.value,
-            },
           });
-        }.bind(this)
-      );
+        });
+      }
     };
 
     this.sendPostMessageData = function (data) {
-      console.error("Sent>>", JSON.stringify(data, undefined, "\t"));
+      console.error(`${this.tag} Sent>>`, JSON.stringify(data, undefined, "\t"));
       parent.postMessage(JSON.stringify(data), this.getOrigin(document.referrer));
     };
 
+    this.getJWTTokens = function () {
+      let jwtToken = window.localStorage.getItem(`${this.tag}_applictaion`);
+      if (jwtToken) {
+        jwtToken = JSON.parse(jwtToken);
+        for (let key in jwtToken) {
+          let value = jwtToken[key];
+          if (value.type === "ofs") {
+            this.sendPostMessageData({
+              apiVersion: 1,
+              method: "callProcedure",
+              callId: this.generateCallId(),
+              procedure: "getAccessToken",
+              params: {
+                applicationKey: key,
+              },
+            });
+          }
+        }
+      }
+    };
+
+    // Data recieved from OFSC to Plugin
     this._messageListener = function (event) {
       const data = JSON.parse(event.data);
-      console.error("Received>>", JSON.stringify(data, undefined, "\t"));
+      console.error(`${this.tag} Received>>`, JSON.stringify(data, undefined, "\t"));
       switch (data.method) {
         case "init":
-          localStorage.setItem("simplePlugin", JSON.stringify(data.attributeDescription));
+          window.localStorage.setItem(`${this.tag}_applictaion`, JSON.stringify(data.applications));
           this.sendPostMessageData({
             apiVersion: 1,
             method: "initEnd",
           });
           break;
         case "open":
+          this.getJWTTokens();
           this.open(data);
           break;
         case "callProcedureResult":
@@ -210,6 +208,6 @@
   window.addEventListener("load", function () {
     console.error("Plugin is loading");
     const plugin = new OfscPlugin();
-    plugin.init();
+    plugin.init("Demo Plugin");
   });
 })();

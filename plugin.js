@@ -26,6 +26,8 @@
 "use strict";
 (function () {
   window.OfscPlugin = function () {
+    this.jwtCallerId = "";
+    this.jwtToken;
     this.init = function (pluginName) {
       this.tag = pluginName;
       window.addEventListener("message", this._messageListener.bind(this), false);
@@ -64,10 +66,6 @@
       }
     };
 
-    this.generateCallId = function () {
-      return btoa(String.fromCharCode.apply(null, window.crypto.getRandomValues(new Uint8Array(16))));
-    };
-
     this.searchPart = function () {
       this.sendPostMessageData({
         apiVersion: 1,
@@ -100,7 +98,6 @@
     this.open = function (data) {
       let activity = data.activity;
       let securedData = data.securedData;
-      console.error("Open>>", activity);
 
       const nameId = document.getElementById("nameId");
 
@@ -111,10 +108,6 @@
           this.sendPostMessageData({
             apiVersion: 1,
             method: "close",
-            activity: {
-              aid: activity.aid,
-              XA_RESOLUTION_CODE: value,
-            },
           });
         });
       }
@@ -144,24 +137,57 @@
           });
         });
       }
+
+      const getLoginDetails = document.getElementById("getLoginDetails");
+      if (!!getLoginDetails) {
+        getLoginDetails.addEventListener("click", () => {
+          this.getLoginDetails();
+        });
+      }
+      // Open --end
+    };
+
+    this.getLoginDetails = function () {
+      let url = "/rest/ofscCore/v1/users/admin?fields=login";
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.jwtToken}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.error("User Details>>", data);
+        });
     };
 
     this.sendPostMessageData = function (data) {
       console.error(`${this.tag} Sent>>`, JSON.stringify(data, undefined, "\t"));
       parent.postMessage(JSON.stringify(data), this.getOrigin(document.referrer));
     };
+    this.generateCallId = function () {
+      return btoa(String.fromCharCode.apply(null, window.crypto.getRandomValues(new Uint8Array(16))));
+    };
 
     this.getJWTTokens = function () {
+      //{
+      // "KEY": {
+      // "type": "ofs",
+      // "resourceUrl": "https://*** */.test.fs.ocs.oraclecloud.com"
+      // }
+      // }}
       let jwtToken = window.localStorage.getItem(`${this.tag}_applictaion`);
       if (jwtToken) {
         jwtToken = JSON.parse(jwtToken);
+        this.jwtCallerId = this.generateCallId();
         for (let key in jwtToken) {
           let value = jwtToken[key];
           if (value.type === "ofs") {
             this.sendPostMessageData({
               apiVersion: 1,
               method: "callProcedure",
-              callId: this.generateCallId(),
+              callId: this.jwtCallerId,
               procedure: "getAccessToken",
               params: {
                 applicationKey: key,
@@ -189,6 +215,11 @@
           this.open(data);
           break;
         case "callProcedureResult":
+          let callId = data.callId;
+          if (callId === this.jwtCallerId) {
+            this.jwtToken = data.resultData.token;
+            console.error("JWT Token>>", this.jwtToken);
+          }
           break;
         case "updateResult":
           break;

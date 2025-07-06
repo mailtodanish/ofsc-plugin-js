@@ -12,26 +12,16 @@
 
 <body>
     <script>
-        if('serviceWorker' in navigator){
-            navigator.serviceWorker.register('./serviceWorker.js',{
-                updateViaCache: 'none'
-            })
-            .then((reg) => console.log('service worker registered', reg))
-            .catch((err) => console.log('service worker not registered', err));
-        }
+       
     </script>
    
     <div class="container mt-5 card p-10">
-        <h5>DEMO PLUGIN</h5>
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="nameId" placeholder="Enter Name">
-        </div>
+        <h5>Geo Location</h5>
+       
         <div id="divId" class="mt-5  d-flex justify-content-center">
-            <button class="btn btn-primary " id="SubmitBtnId">Submit/Close</button>
-            <button class="btn btn-primary " id="SaveBtnId">Save</button>
+            <button class="btn btn-primary " id="SubmitBtnId">Submit</button>         
             <button class="btn btn-primary " id="CancelBtnId">Cancel</button>
-            <button class="btn btn-primary " id="getLoginDetails">Get Login</button>
+        
         </div>
         </div>
 

@@ -28,6 +28,7 @@
   window.OfscPlugin = function () {
     this.jwtCallerId = "";
     this.jwtToken;
+    this.geolocationCoordinates = "";
     this.init = function (pluginName) {
       this.tag = pluginName;
       window.addEventListener("message", this._messageListener.bind(this), false);
@@ -95,33 +96,38 @@
         });
     };
 
+    this.getGeoLocation = function () {
+      return new Promise(function (resolve, reject) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const crd = pos.coords;
+            console.error("Coordinates>>", crd.latitude + "," + crd.longitude);
+
+            resolve(crd.latitude + "," + crd.longitude);
+          },
+          (error) => {
+            console.error("Error", error);
+            reject(error);
+          }
+        );
+      });
+    };
+
     this.open = function (data) {
       let activity = data.activity;
       let securedData = data.securedData;
 
-      const nameId = document.getElementById("nameId");
-
       const submit = document.getElementById("SubmitBtnId");
       if (!!submit) {
-        submit.addEventListener("click", () => {
-          let value = nameId.value; // User Input
+        submit.addEventListener("click", async () => {
+          this.geolocationCoordinates = await this.getGeoLocation();
+          alert("Exact Location>>" + this.geolocationCoordinates);
           this.sendPostMessageData({
             apiVersion: 1,
             method: "close",
-          });
-        });
-      }
-
-      const SaveBtnId = document.getElementById("SaveBtnId");
-      if (!!SaveBtnId) {
-        SaveBtnId.addEventListener("click", () => {
-          let value = nameId.value; // User Input
-          this.sendPostMessageData({
-            apiVersion: 1,
-            method: "update",
             activity: {
-              aid: activity.aid,
-              XA_RESOLUTION_CODE: value,
+              aid: data.activity.aid,
+              XP_LOCATION_CRD: this.geolocationCoordinates,
             },
           });
         });
@@ -138,12 +144,6 @@
         });
       }
 
-      const getLoginDetails = document.getElementById("getLoginDetails");
-      if (!!getLoginDetails) {
-        getLoginDetails.addEventListener("click", () => {
-          this.getLoginDetails();
-        });
-      }
       // Open --end
     };
 
